@@ -5,9 +5,9 @@ import { SiLeetcode } from 'react-icons/si';
 const Footer = () => {
   const socialLinks = [
     { icon: <FiGithub />, href: 'https://github.com/sahil00016' },
-    { icon: <FiLinkedin />, href: 'https://linkedin.com' },
-    { icon: <SiLeetcode />, href: 'https://leetcode.com/sahilsonker5111/' },
-    { icon: <FiInstagram />, href: 'https://instagram.com' },
+    { icon: <FiLinkedin />, href: 'https://www.linkedin.com/in/sahil-sonker-1a5234259/' },
+    { icon: <SiLeetcode />, href: 'https://leetcode.com/u/sahil016/' },
+    { icon: <FiInstagram />, href: 'https://www.instagram.com/_aarav016_/' },
   ];
 
   return (

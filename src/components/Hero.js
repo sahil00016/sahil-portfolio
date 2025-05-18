@@ -187,8 +187,8 @@ const Hero = () => {
         >
           {[
             { Icon: FiGithub, url: 'https://github.com/sahil00016' },
-            { Icon: FiLinkedin, url: 'https://linkedin.com' },
-            { Icon: SiLeetcode, url: 'https://leetcode.com/sahilsonker5111/' }
+            { Icon: FiLinkedin, url: 'https://www.linkedin.com/in/sahil-sonker-1a5234259/' },
+            { Icon: SiLeetcode, url: 'https://leetcode.com/u/sahil016/' }
           ].map(({ Icon, url }, index) => (
             <motion.a
               key={index}
