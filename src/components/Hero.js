@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiGithub, FiLinkedin, FiTwitter, FiSettings } from 'react-icons/fi';
+import { FiGithub, FiLinkedin, FiSettings } from 'react-icons/fi';
+import { SiLeetcode } from 'react-icons/si';
 
 const Hero = () => {
   const [isColorPaletteOpen, setIsColorPaletteOpen] = useState(false);
@@ -184,10 +185,14 @@ const Hero = () => {
           transition={{ delay: 2 }}
           className="flex justify-center md:justify-start space-x-6"
         >
-          {[FiGithub, FiLinkedin, FiTwitter].map((Icon, index) => (
+          {[
+            { Icon: FiGithub, url: 'https://github.com/sahil00016' },
+            { Icon: FiLinkedin, url: 'https://linkedin.com' },
+            { Icon: SiLeetcode, url: 'https://leetcode.com/sahilsonker5111/' }
+          ].map(({ Icon, url }, index) => (
             <motion.a
               key={index}
-              href="#"
+              href={url}
               target="_blank"
               rel="noopener noreferrer"
               whileHover={{ scale: 1.2, y: -5 }}

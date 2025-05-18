@@ -1,11 +1,12 @@
 import React from 'react';
-import { FiGithub, FiLinkedin, FiTwitter, FiInstagram } from 'react-icons/fi';
+import { FiGithub, FiLinkedin, FiInstagram } from 'react-icons/fi';
+import { SiLeetcode } from 'react-icons/si';
 
 const Footer = () => {
   const socialLinks = [
-    { icon: <FiGithub />, href: 'https://github.com' },
+    { icon: <FiGithub />, href: 'https://github.com/sahil00016' },
     { icon: <FiLinkedin />, href: 'https://linkedin.com' },
-    { icon: <FiTwitter />, href: 'https://twitter.com' },
+    { icon: <SiLeetcode />, href: 'https://leetcode.com/sahilsonker5111/' },
     { icon: <FiInstagram />, href: 'https://instagram.com' },
   ];
 
