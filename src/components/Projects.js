@@ -1,10 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiGithub, FiExternalLink, FiX, FiPlus } from 'react-icons/fi';
+import { FiGithub, FiExternalLink, FiX, FiPlus, FiEdit2, FiTrash2 } from 'react-icons/fi';
 
 const Projects = () => {
-  const [projects, setProjects] = useState([]);
+  const [projects, setProjects] = useState(() => {
+    // Initialize projects from localStorage if available
+    const savedProjects = localStorage.getItem('portfolioProjects');
+    return savedProjects ? JSON.parse(savedProjects) : [];
+  });
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [editingProject, setEditingProject] = useState(null);
   const [newProject, setNewProject] = useState({
     title: '',
     description: '',
@@ -14,12 +20,22 @@ const Projects = () => {
     tech: '',
   });
 
+  // Add useEffect to save projects to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('portfolioProjects', JSON.stringify(projects));
+    console.log('Projects updated:', projects); // Debug log
+  }, [projects]);
+
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setNewProject({ ...newProject, image: reader.result });
+        if (isEditMode) {
+          setEditingProject({ ...editingProject, image: reader.result });
+        } else {
+          setNewProject({ ...newProject, image: reader.result });
+        }
       };
       reader.readAsDataURL(file);
     }
@@ -27,7 +43,22 @@ const Projects = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setProjects([...projects, { ...newProject, id: Date.now() }]);
+    if (isEditMode && editingProject) {
+      const updatedProjects = projects.map(p => 
+        p.id === editingProject.id ? editingProject : p
+      );
+      setProjects(updatedProjects);
+      setEditingProject(null);
+      setIsEditMode(false);
+    } else {
+      const newProjectData = { 
+        ...newProject, 
+        id: Date.now(),
+        createdAt: new Date().toISOString()
+      };
+      setProjects(prevProjects => [...prevProjects, newProjectData]);
+      console.log('Adding new project:', newProjectData); // Debug log
+    }
     setIsModalOpen(false);
     setNewProject({
       title: '',
@@ -37,6 +68,18 @@ const Projects = () => {
       live: '',
       tech: '',
     });
+  };
+
+  const handleEdit = (project) => {
+    setEditingProject(project);
+    setIsEditMode(true);
+    setIsModalOpen(true);
+  };
+
+  const handleDelete = (projectId) => {
+    if (window.confirm('Are you sure you want to delete this project?')) {
+      setProjects(projects.filter(p => p.id !== projectId));
+    }
   };
 
   const container = {
@@ -131,31 +174,86 @@ const Projects = () => {
             <motion.div
               key={project.id}
               variants={item}
-              className="bg-tertiary rounded-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300"
+              className="bg-tertiary rounded-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300 relative"
             >
-              <div className="relative group aspect-video">
-                <img
-                  src={project.image}
-                  alt={project.title}
-                  className="w-full h-full object-cover"
-                />
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  whileHover={{ opacity: 1 }}
-                  transition={{ duration: 0.3 }}
-                  className="absolute inset-0 bg-gradient-to-b from-transparent to-primary/90 flex items-center justify-center"
+              {/* Edit and Delete Buttons */}
+              <div className="absolute top-2 right-2 flex space-x-2 z-20">
+                <motion.button
+                  onClick={() => handleEdit(project)}
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  className="p-2 bg-tertiary rounded-full text-secondary hover:bg-primary transition-colors duration-300 shadow-lg"
+                  title="Edit project"
                 >
-                  <div className="flex space-x-6">
-                    <motion.a
-                      href={project.github}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      whileHover={{ scale: 1.2, rotate: 360 }}
-                      whileTap={{ scale: 0.9 }}
-                      className="text-secondary hover:text-white transition-colors duration-300"
-                    >
-                      <FiGithub size={24} />
-                    </motion.a>
+                  <FiEdit2 size={18} />
+                </motion.button>
+                <motion.button
+                  onClick={() => handleDelete(project.id)}
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  className="p-2 bg-tertiary rounded-full text-red-400 hover:text-red-500 hover:bg-primary transition-colors duration-300 shadow-lg"
+                  title="Delete project"
+                >
+                  <FiTrash2 size={18} />
+                </motion.button>
+              </div>
+
+              {/* Project Image Section */}
+              {project.image && (
+                <div className="relative group aspect-video">
+                  <img
+                    src={project.image}
+                    alt={project.title}
+                    className="w-full h-full object-cover"
+                  />
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    whileHover={{ opacity: 1 }}
+                    transition={{ duration: 0.3 }}
+                    className="absolute inset-0 bg-gradient-to-b from-transparent to-primary/90 flex items-center justify-center"
+                  >
+                    <div className="flex space-x-4">
+                      <motion.a
+                        href={project.github}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        whileHover={{ scale: 1.2, rotate: 360 }}
+                        whileTap={{ scale: 0.9 }}
+                        className="text-secondary hover:text-white transition-colors duration-300"
+                      >
+                        <FiGithub size={24} />
+                      </motion.a>
+                      {project.live && (
+                        <motion.a
+                          href={project.live}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          whileHover={{ scale: 1.2, rotate: 360 }}
+                          whileTap={{ scale: 0.9 }}
+                          className="text-secondary hover:text-white transition-colors duration-300"
+                        >
+                          <FiExternalLink size={24} />
+                        </motion.a>
+                      )}
+                    </div>
+                  </motion.div>
+                </div>
+              )}
+
+              {/* Project Links Section (when no image) */}
+              {!project.image && (
+                <div className="p-4 flex justify-end space-x-4">
+                  <motion.a
+                    href={project.github}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    whileHover={{ scale: 1.2, rotate: 360 }}
+                    whileTap={{ scale: 0.9 }}
+                    className="text-secondary hover:text-white transition-colors duration-300"
+                  >
+                    <FiGithub size={24} />
+                  </motion.a>
+                  {project.live && (
                     <motion.a
                       href={project.live}
                       target="_blank"
@@ -166,9 +264,11 @@ const Projects = () => {
                     >
                       <FiExternalLink size={24} />
                     </motion.a>
-                  </div>
-                </motion.div>
-              </div>
+                  )}
+                </div>
+              )}
+
+              {/* Project Details */}
               <motion.div
                 className="p-6"
                 initial={{ opacity: 0, y: 20 }}
@@ -195,7 +295,7 @@ const Projects = () => {
           ))}
         </motion.div>
 
-        {/* Add Project Modal */}
+        {/* Add/Edit Project Modal */}
         <AnimatePresence>
           {isModalOpen && (
             <motion.div
@@ -212,19 +312,31 @@ const Projects = () => {
                 className="bg-tertiary p-8 rounded-lg w-full max-w-md relative"
               >
                 <button
-                  onClick={() => setIsModalOpen(false)}
+                  onClick={() => {
+                    setIsModalOpen(false);
+                    setIsEditMode(false);
+                    setEditingProject(null);
+                  }}
                   className="absolute top-4 right-4 text-lightText hover:text-secondary transition-colors"
                 >
                   <FiX size={24} />
                 </button>
-                <h3 className="text-2xl font-bold text-lightText mb-6">Add New Project</h3>
+                <h3 className="text-2xl font-bold text-lightText mb-6">
+                  {isEditMode ? 'Edit Project' : 'Add New Project'}
+                </h3>
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div>
                     <label className="block text-lightText mb-2">Title</label>
                     <input
                       type="text"
-                      value={newProject.title}
-                      onChange={(e) => setNewProject({ ...newProject, title: e.target.value })}
+                      value={isEditMode ? editingProject.title : newProject.title}
+                      onChange={(e) => {
+                        if (isEditMode) {
+                          setEditingProject({ ...editingProject, title: e.target.value });
+                        } else {
+                          setNewProject({ ...newProject, title: e.target.value });
+                        }
+                      }}
                       className="w-full bg-primary text-lightText p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary transition-all duration-300"
                       required
                     />
@@ -232,8 +344,14 @@ const Projects = () => {
                   <div>
                     <label className="block text-lightText mb-2">Description</label>
                     <textarea
-                      value={newProject.description}
-                      onChange={(e) => setNewProject({ ...newProject, description: e.target.value })}
+                      value={isEditMode ? editingProject.description : newProject.description}
+                      onChange={(e) => {
+                        if (isEditMode) {
+                          setEditingProject({ ...editingProject, description: e.target.value });
+                        } else {
+                          setNewProject({ ...newProject, description: e.target.value });
+                        }
+                      }}
                       className="w-full bg-primary text-lightText p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary transition-all duration-300"
                       rows="3"
                       required
@@ -246,35 +364,62 @@ const Projects = () => {
                       accept="image/*"
                       onChange={handleImageChange}
                       className="w-full text-lightText"
-                      required
                     />
+                    {isEditMode && editingProject.image && (
+                      <div className="mt-2">
+                        <p className="text-sm text-lightestText mb-1">Current image:</p>
+                        <img
+                          src={editingProject.image}
+                          alt="Current project"
+                          className="w-20 h-20 object-cover rounded"
+                        />
+                      </div>
+                    )}
                   </div>
                   <div>
                     <label className="block text-lightText mb-2">GitHub URL</label>
                     <input
                       type="url"
-                      value={newProject.github}
-                      onChange={(e) => setNewProject({ ...newProject, github: e.target.value })}
+                      value={isEditMode ? editingProject.github : newProject.github}
+                      onChange={(e) => {
+                        if (isEditMode) {
+                          setEditingProject({ ...editingProject, github: e.target.value });
+                        } else {
+                          setNewProject({ ...newProject, github: e.target.value });
+                        }
+                      }}
                       className="w-full bg-primary text-lightText p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary transition-all duration-300"
                       required
                     />
                   </div>
                   <div>
-                    <label className="block text-lightText mb-2">Live URL</label>
+                    <label className="block text-lightText mb-2">Live URL (Optional)</label>
                     <input
                       type="url"
-                      value={newProject.live}
-                      onChange={(e) => setNewProject({ ...newProject, live: e.target.value })}
+                      value={isEditMode ? editingProject.live : newProject.live}
+                      onChange={(e) => {
+                        if (isEditMode) {
+                          setEditingProject({ ...editingProject, live: e.target.value });
+                        } else {
+                          setNewProject({ ...newProject, live: e.target.value });
+                        }
+                      }}
                       className="w-full bg-primary text-lightText p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary transition-all duration-300"
-                      required
+                      placeholder="https://your-project-url.com"
                     />
                   </div>
                   <div>
                     <label className="block text-lightText mb-2">Technologies (comma-separated)</label>
                     <input
                       type="text"
-                      value={newProject.tech}
-                      onChange={(e) => setNewProject({ ...newProject, tech: e.target.value })}
+                      value={isEditMode ? editingProject.tech : newProject.tech}
+                      onChange={(e) => {
+                        if (isEditMode) {
+                          setEditingProject({ ...editingProject, tech: e.target.value });
+                        } else {
+                          setNewProject({ ...newProject, tech: e.target.value });
+                        }
+                      }}
                       className="w-full bg-primary text-lightText p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary transition-all duration-300"
                       placeholder="React, Tailwind, Node.js"
                       required
@@ -283,7 +428,11 @@ const Projects = () => {
                   <div className="flex justify-end space-x-4 mt-6">
                     <motion.button
                       type="button"
-                      onClick={() => setIsModalOpen(false)}
+                      onClick={() => {
+                        setIsModalOpen(false);
+                        setIsEditMode(false);
+                        setEditingProject(null);
+                      }}
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                       className="px-4 py-2 text-lightText hover:text-secondary transition-colors duration-300"
@@ -296,7 +445,7 @@ const Projects = () => {
                       whileTap={{ scale: 0.95 }}
                       className="px-6 py-2 bg-secondary text-primary rounded-lg hover:bg-opacity-80 transition-all duration-300"
                     >
-                      Add Project
+                      {isEditMode ? 'Save Changes' : 'Add Project'}
                     </motion.button>
                   </div>
                 </form>

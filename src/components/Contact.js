@@ -20,17 +20,17 @@ const Contact = () => {
   const contactInfo = [
     {
       icon: <FiMail className="w-6 h-6" />,
-      text: 'your.email@example.com',
-      href: 'mailto:your.email@example.com',
+      text: 'sahilsonker5111@gmail.com',
+      href: 'mailto:sahilsonker5111@gmail.com',
     },
     {
       icon: <FiPhone className="w-6 h-6" />,
-      text: '+1 (234) 567-8900',
-      href: 'tel:+12345678900',
+      text: '+91 9163087800',
+      href: 'tel:+91 9163087800',
     },
     {
       icon: <FiMapPin className="w-6 h-6" />,
-      text: 'Your Location',
+      text: 'Kolkata, West Bengal, India',
       href: '#',
     },
   ];
