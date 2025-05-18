@@ -158,7 +158,7 @@ const Hero = () => {
           style={{ color: titleColor }}
         >
           <span className="relative">
-            I build things for the web.
+            I'm a full stack developer.
             <motion.span
               className="absolute -bottom-2 left-0 w-full h-1"
               style={{ backgroundColor: nameColor }}
@@ -175,7 +175,7 @@ const Hero = () => {
           transition={{ duration: 0.5, delay: 1.7 }}
           className="text-lightestText text-lg max-w-2xl mb-12 relative backdrop-blur-sm bg-primary/30 p-6 rounded-lg border border-secondary/20"
         >
-          I'm a software developer specializing in building exceptional digital experiences.
+          I'm a full stack developer specializing in building exceptional digital experiences.
           Currently, I'm focused on building accessible, human-centered products.
         </motion.p>
         

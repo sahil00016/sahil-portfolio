@@ -28,6 +28,10 @@ const About = () => {
     show: { opacity: 1, x: 0 },
   };
 
+  const handleDownloadResume = () => {
+    window.open('/resume/web_dev.pdf', '_blank');
+  };
+
   return (
     <div id="about" className="min-h-screen py-20 bg-primary relative">
       {/* Decorative Elements */}
@@ -108,6 +112,40 @@ const About = () => {
                 </motion.div>
               ))}
             </motion.div>
+
+            {/* Resume Download Button */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2 }}
+              className="mt-8"
+            >
+              <motion.button
+                onClick={handleDownloadResume}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="group relative inline-flex items-center justify-center px-6 py-3 bg-secondary text-primary font-mono font-medium rounded-lg overflow-hidden transition-all duration-300 hover:bg-secondary/90"
+              >
+                <span className="relative z-10 flex items-center">
+                  <svg
+                    className="w-5 h-5 mr-2 transform group-hover:rotate-12 transition-transform duration-300"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                    />
+                  </svg>
+                  Download Resume
+                </span>
+                <div className="absolute inset-0 bg-white/20 transform -skew-x-12 -translate-x-full group-hover:translate-x-0 transition-transform duration-300" />
+              </motion.button>
+            </motion.div>
           </div>
           
           <motion.div
@@ -117,7 +155,7 @@ const About = () => {
             transition={{ duration: 0.8 }}
             className="relative group"
           >
-            <div className="relative w-full max-w-lg mx-auto">
+            <div className="relative w-full max-w-sm mx-auto">
               {/* Decorative Elements */}
               <motion.div
                 className="absolute -inset-0.5 bg-secondary rounded-lg blur opacity-75 group-hover:opacity-100 transition duration-1000 group-hover:duration-200"
@@ -132,11 +170,13 @@ const About = () => {
               />
               <div className="relative bg-tertiary rounded-lg p-2">
                 <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-secondary/20 to-transparent rounded-lg" />
-                <img
-                  src="/images/profile.jpg"
-                  alt="Sahil Sonker"
-                  className="rounded-lg w-full h-full object-cover relative z-10 hover:grayscale-0 transition-all duration-300"
-                />
+                <div className="aspect-[3/4] overflow-hidden rounded-lg">
+                  <img
+                    src="/images/profile.jpg"
+                    alt="Sahil Sonker"
+                    className="w-full h-full object-cover object-center relative z-10 hover:grayscale-0 transition-all duration-300"
+                  />
+                </div>
                 <motion.div
                   className="absolute inset-0 bg-primary/50 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg flex items-center justify-center"
                   whileHover={{ opacity: 1 }}
