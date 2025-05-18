@@ -3,14 +3,14 @@ import { motion } from 'framer-motion';
 
 const About = () => {
   const skills = [
-    { name: 'JavaScript (ES6+)', icon: '⚡' },
-    { name: 'React', icon: '⚛️' },
-    { name: 'Node.js', icon: '🚀' },
+    { name: 'React.js', icon: '⚛️' },
+    { name: 'Flutter', icon: '📱' },
     { name: 'TypeScript', icon: '📘' },
-    { name: 'Tailwind CSS', icon: '🎨' },
-    { name: 'Python', icon: '🐍' },
-    { name: 'Git', icon: '🔄' },
+    { name: 'Firebase', icon: '🔥' },
+    { name: 'Node.js', icon: '🚀' },
     { name: 'MongoDB', icon: '🍃' },
+    { name: 'Dart', icon: '🎯' },
+    { name: 'JavaScript', icon: '⚡' },
   ];
 
   const container = {
@@ -76,17 +76,10 @@ const About = () => {
               className="space-y-4 text-lightestText"
             >
               <motion.p variants={item} className="relative pl-6 border-l-2 border-secondary">
-                Hello! I'm Sahil, a passionate software developer who loves building
-                things for the web. My interest in web development started back in
-                college when I decided to try editing custom Tumblr themes — turns
-                out hacking together a custom reblog button taught me a lot about
-                HTML & CSS!
+              Hey there! I'm Sahil Sonker, a full-stack developer passionate about building dynamic, user-centric web and mobile apps. My journey started at the Indian Institute of Information Technology, Vadodara, mastering tools like ReactJS, Flutter, and TypeScript. Crafting a real-time chat app with Flutter and Firebase was a game-changer, igniting my drive to create seamless digital experiences through clean, innovative code.
               </motion.p>
               <motion.p variants={item} className="relative pl-6 border-l-2 border-secondary">
-                Fast-forward to today, and I've had the privilege of working at
-                various companies, from startups to large corporations. My main
-                focus these days is building accessible, inclusive products and
-                digital experiences.
+              Recently, I wrapped up a frontend developer internship at Code Inbound LLP (Nov 2024–May 2025), where I built real-time dashboards for Network Monitoring Systems, boosting UI responsiveness by 25%. My projects, like an AI-powered code editor with Gemini API and a MERN-based event platform, showcase my focus on performance and usability. With skills in Dart, JavaScript, and modern frameworks, I'm eager to keep delivering cutting-edge full-stack solutions.
               </motion.p>
               <motion.p variants={item} className="font-mono text-secondary">
                 Here are a few technologies I've been working with recently:
