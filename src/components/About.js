@@ -133,9 +133,9 @@ const About = () => {
               <div className="relative bg-tertiary rounded-lg p-2">
                 <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-secondary/20 to-transparent rounded-lg" />
                 <img
-                  src="https://via.placeholder.com/500"
-                  alt="Profile"
-                  className="rounded-lg w-full h-full object-cover relative z-10 grayscale hover:grayscale-0 transition-all duration-300"
+                  src="/images/profile.jpg"
+                  alt="Sahil Sonker"
+                  className="rounded-lg w-full h-full object-cover relative z-10 hover:grayscale-0 transition-all duration-300"
                 />
                 <motion.div
                   className="absolute inset-0 bg-primary/50 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg flex items-center justify-center"
