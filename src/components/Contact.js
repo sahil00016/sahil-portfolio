@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { FiMail, FiPhone, FiMapPin } from 'react-icons/fi';
+import emailjs from '@emailjs/browser';
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -8,20 +9,40 @@ const Contact = () => {
     email: '',
     message: '',
   });
+  const [status, setStatus] = useState('');
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Here you would typically handle the form submission
-    console.log('Form submitted:', formData);
-    // Reset form
-    setFormData({ name: '', email: '', message: '' });
+    setStatus('sending');
+
+    emailjs.send(
+      'service_uzl3zq5',
+      'template_pliaptk',
+      {
+        from_name: formData.name,
+        from_email: formData.email,
+        message: formData.message,
+        to_email: 'sahilsonker51115@gmail.com',
+      },
+      'J6HwyuoOqITuHowkJ'
+    )
+    .then(() => {
+      setStatus('success');
+      setFormData({ name: '', email: '', message: '' });
+      setTimeout(() => setStatus(''), 3000);
+    })
+    .catch((error) => {
+      console.error('Error:', error);
+      setStatus('error');
+      setTimeout(() => setStatus(''), 3000);
+    });
   };
 
   const contactInfo = [
     {
       icon: <FiMail className="w-6 h-6" />,
-      text: 'sahilsonker5111@gmail.com',
-      href: 'mailto:sahilsonker5111@gmail.com',
+      text: 'sahilsonker51115@gmail.com',
+      href: 'mailto:sahilsonker51115@gmail.com',
     },
     {
       icon: <FiPhone className="w-6 h-6" />,
@@ -101,10 +122,33 @@ const Contact = () => {
               </div>
               <button
                 type="submit"
-                className="w-full bg-secondary text-primary py-3 rounded-lg font-medium hover:bg-opacity-80 transition-all duration-300"
+                disabled={status === 'sending'}
+                className={`w-full bg-secondary text-primary py-3 rounded-lg font-medium transition-all duration-300 ${
+                  status === 'sending' ? 'opacity-70 cursor-not-allowed' : 'hover:bg-opacity-80'
+                }`}
               >
-                Send Message
+                {status === 'sending' ? 'Sending...' : 'Send Message'}
               </button>
+
+              {status === 'success' && (
+                <motion.p
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="text-green-500 text-center mt-2"
+                >
+                  Message sent successfully!
+                </motion.p>
+              )}
+
+              {status === 'error' && (
+                <motion.p
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="text-red-500 text-center mt-2"
+                >
+                  Failed to send message. Please try again.
+                </motion.p>
+              )}
             </form>
           </motion.div>
 
