@@ -1,13 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiGithub, FiExternalLink, FiX, FiPlus, FiEdit2, FiTrash2 } from 'react-icons/fi';
+import projectsData from '../data/projects.json';
 
 const Projects = () => {
-  const [projects, setProjects] = useState(() => {
-    // Initialize projects from localStorage if available
-    const savedProjects = localStorage.getItem('portfolioProjects');
-    return savedProjects ? JSON.parse(savedProjects) : [];
-  });
+  const [projects, setProjects] = useState(projectsData.projects);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [editingProject, setEditingProject] = useState(null);
@@ -22,12 +19,6 @@ const Projects = () => {
     live: '',
     tech: '',
   });
-
-  // Add useEffect to save projects to localStorage whenever it changes
-  useEffect(() => {
-    localStorage.setItem('portfolioProjects', JSON.stringify(projects));
-    console.log('Projects updated:', projects); // Debug log
-  }, [projects]);
 
   // Modified admin activation/deactivation function
   const toggleAdmin = () => {
@@ -47,6 +38,122 @@ const Projects = () => {
     }
   };
 
+  // Modified handleAddProject to update JSON file
+  const handleAddProject = async (e) => {
+    e.preventDefault();
+    const projectWithId = {
+      ...newProject,
+      id: Date.now(),
+    };
+
+    try {
+      // Update local state
+      const updatedProjects = [...projects, projectWithId];
+      setProjects(updatedProjects);
+
+      // Update JSON file
+      const response = await fetch('/api/update-projects', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ projects: updatedProjects }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update projects');
+      }
+
+      setIsModalOpen(false);
+      setNewProject({
+        title: '',
+        description: '',
+        image: null,
+        github: '',
+        live: '',
+        tech: '',
+      });
+    } catch (error) {
+      console.error('Error updating projects:', error);
+      alert('Failed to save project. Please try again.');
+    }
+  };
+
+  // Modified handleDelete to update JSON file
+  const handleDelete = async (id) => {
+    if (window.confirm('Are you sure you want to delete this project?')) {
+      try {
+        // Update local state
+        const updatedProjects = projects.filter((project) => project.id !== id);
+        setProjects(updatedProjects);
+
+        // Update JSON file
+        const response = await fetch('/api/update-projects', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ projects: updatedProjects }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to update projects');
+        }
+      } catch (error) {
+        console.error('Error deleting project:', error);
+        alert('Failed to delete project. Please try again.');
+      }
+    }
+  };
+
+  // Modified handleEdit to update JSON file
+  const handleEdit = async (project) => {
+    setEditingProject(project);
+    setNewProject(project);
+    setIsEditMode(true);
+    setIsModalOpen(true);
+  };
+
+  // Modified handleUpdate to update JSON file
+  const handleUpdate = async (e) => {
+    e.preventDefault();
+    try {
+      // Update local state
+      const updatedProjects = projects.map((project) =>
+        project.id === editingProject.id ? { ...newProject, id: project.id } : project
+      );
+      setProjects(updatedProjects);
+
+      // Update JSON file
+      const response = await fetch('/api/update-projects', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ projects: updatedProjects }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update projects');
+      }
+
+      setIsModalOpen(false);
+      setIsEditMode(false);
+      setEditingProject(null);
+      setNewProject({
+        title: '',
+        description: '',
+        image: null,
+        github: '',
+        live: '',
+        tech: '',
+      });
+    } catch (error) {
+      console.error('Error updating project:', error);
+      alert('Failed to update project. Please try again.');
+    }
+  };
+
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -59,47 +166,6 @@ const Projects = () => {
         }
       };
       reader.readAsDataURL(file);
-    }
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (isEditMode && editingProject) {
-      const updatedProjects = projects.map(p => 
-        p.id === editingProject.id ? editingProject : p
-      );
-      setProjects(updatedProjects);
-      setEditingProject(null);
-      setIsEditMode(false);
-    } else {
-      const newProjectData = { 
-        ...newProject, 
-        id: Date.now(),
-        createdAt: new Date().toISOString()
-      };
-      setProjects(prevProjects => [...prevProjects, newProjectData]);
-      console.log('Adding new project:', newProjectData); // Debug log
-    }
-    setIsModalOpen(false);
-    setNewProject({
-      title: '',
-      description: '',
-      image: null,
-      github: '',
-      live: '',
-      tech: '',
-    });
-  };
-
-  const handleEdit = (project) => {
-    setEditingProject(project);
-    setIsEditMode(true);
-    setIsModalOpen(true);
-  };
-
-  const handleDelete = (projectId) => {
-    if (window.confirm('Are you sure you want to delete this project?')) {
-      setProjects(projects.filter(p => p.id !== projectId));
     }
   };
 
@@ -349,7 +415,7 @@ const Projects = () => {
                 <h3 className="text-2xl font-bold text-lightText mb-6">
                   {isEditMode ? 'Edit Project' : 'Add New Project'}
                 </h3>
-                <form onSubmit={handleSubmit} className="space-y-4">
+                <form onSubmit={isEditMode ? handleUpdate : handleAddProject} className="space-y-4">
                   <div>
                     <label className="block text-lightText mb-2">Title</label>
                     <input
