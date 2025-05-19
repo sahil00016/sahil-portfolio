@@ -1,174 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { FiGithub, FiExternalLink, FiX, FiPlus, FiEdit2, FiTrash2 } from 'react-icons/fi';
-import projectsData from '../data/projects.json';
+import React from 'react';
+import { motion } from 'framer-motion';
+import { FiGithub, FiExternalLink } from 'react-icons/fi';
+import projects from '../data/projects';
 
 const Projects = () => {
-  const [projects, setProjects] = useState(projectsData.projects);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isEditMode, setIsEditMode] = useState(false);
-  const [editingProject, setEditingProject] = useState(null);
-  const [isAdmin, setIsAdmin] = useState(() => {
-    return localStorage.getItem('isPortfolioAdmin') === 'true';
-  });
-  const [newProject, setNewProject] = useState({
-    title: '',
-    description: '',
-    image: null,
-    github: '',
-    live: '',
-    tech: '',
-  });
-
-  // Modified admin activation/deactivation function
-  const toggleAdmin = () => {
-    const password = prompt(isAdmin ? 'Enter password to logout:' : 'Enter admin password:');
-    if (password === 'sahil016') {
-      if (isAdmin) {
-        // Logout
-        localStorage.removeItem('isPortfolioAdmin');
-        setIsAdmin(false);
-        alert('Logged out of admin mode');
-      } else {
-        // Login
-        localStorage.setItem('isPortfolioAdmin', 'true');
-        setIsAdmin(true);
-        alert('Logged in as admin');
-      }
-    }
-  };
-
-  // Modified handleAddProject to update JSON file
-  const handleAddProject = async (e) => {
-    e.preventDefault();
-    const projectWithId = {
-      ...newProject,
-      id: Date.now(),
-    };
-
-    try {
-      // Update local state
-      const updatedProjects = [...projects, projectWithId];
-      setProjects(updatedProjects);
-
-      // Update JSON file
-      const response = await fetch('/api/update-projects', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ projects: updatedProjects }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to update projects');
-      }
-
-      setIsModalOpen(false);
-      setNewProject({
-        title: '',
-        description: '',
-        image: null,
-        github: '',
-        live: '',
-        tech: '',
-      });
-    } catch (error) {
-      console.error('Error updating projects:', error);
-      alert('Failed to save project. Please try again.');
-    }
-  };
-
-  // Modified handleDelete to update JSON file
-  const handleDelete = async (id) => {
-    if (window.confirm('Are you sure you want to delete this project?')) {
-      try {
-        // Update local state
-        const updatedProjects = projects.filter((project) => project.id !== id);
-        setProjects(updatedProjects);
-
-        // Update JSON file
-        const response = await fetch('/api/update-projects', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ projects: updatedProjects }),
-        });
-
-        if (!response.ok) {
-          throw new Error('Failed to update projects');
-        }
-      } catch (error) {
-        console.error('Error deleting project:', error);
-        alert('Failed to delete project. Please try again.');
-      }
-    }
-  };
-
-  // Modified handleEdit to update JSON file
-  const handleEdit = async (project) => {
-    setEditingProject(project);
-    setNewProject(project);
-    setIsEditMode(true);
-    setIsModalOpen(true);
-  };
-
-  // Modified handleUpdate to update JSON file
-  const handleUpdate = async (e) => {
-    e.preventDefault();
-    try {
-      // Update local state
-      const updatedProjects = projects.map((project) =>
-        project.id === editingProject.id ? { ...newProject, id: project.id } : project
-      );
-      setProjects(updatedProjects);
-
-      // Update JSON file
-      const response = await fetch('/api/update-projects', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ projects: updatedProjects }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to update projects');
-      }
-
-      setIsModalOpen(false);
-      setIsEditMode(false);
-      setEditingProject(null);
-      setNewProject({
-        title: '',
-        description: '',
-        image: null,
-        github: '',
-        live: '',
-        tech: '',
-      });
-    } catch (error) {
-      console.error('Error updating project:', error);
-      alert('Failed to update project. Please try again.');
-    }
-  };
-
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        if (isEditMode) {
-          setEditingProject({ ...editingProject, image: reader.result });
-        } else {
-          setNewProject({ ...newProject, image: reader.result });
-        }
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
   const container = {
     hidden: { opacity: 0 },
     show: {
@@ -185,7 +20,7 @@ const Projects = () => {
   };
 
   return (
-    <div id="projects" className="min-h-screen py-20 relative" onDoubleClick={toggleAdmin}>
+    <div id="projects" className="min-h-screen py-20 relative">
       {/* Background Decorative Elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute w-full h-full">
@@ -235,20 +70,6 @@ const Projects = () => {
             />
           </h2>
           <p className="text-lightestText mb-8">Some things I've built</p>
-          {isAdmin && (
-            <motion.button
-              onClick={() => setIsModalOpen(true)}
-              className="group relative inline-flex items-center justify-center px-8 py-3 overflow-hidden font-medium bg-secondary text-primary rounded-lg hover:bg-opacity-80 transition-all duration-300"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <span className="absolute w-0 h-0 transition-all duration-500 ease-out bg-primary rounded-full group-hover:w-56 group-hover:h-56"></span>
-              <span className="relative flex items-center space-x-2">
-                <FiPlus className="w-5 h-5" />
-                <span>Add New Project</span>
-              </span>
-            </motion.button>
-          )}
         </motion.div>
 
         {/* Projects Grid */}
@@ -265,32 +86,8 @@ const Projects = () => {
               variants={item}
               className="bg-tertiary rounded-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300 relative"
             >
-              {/* Edit and Delete Buttons - Only show for admin */}
-              {isAdmin && (
-                <div className="absolute top-2 right-2 flex space-x-2 z-20">
-                  <motion.button
-                    onClick={() => handleEdit(project)}
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                    className="p-2 bg-tertiary rounded-full text-secondary hover:bg-primary transition-colors duration-300 shadow-lg"
-                    title="Edit project"
-                  >
-                    <FiEdit2 size={18} />
-                  </motion.button>
-                  <motion.button
-                    onClick={() => handleDelete(project.id)}
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                    className="p-2 bg-tertiary rounded-full text-red-400 hover:text-red-500 hover:bg-primary transition-colors duration-300 shadow-lg"
-                    title="Delete project"
-                  >
-                    <FiTrash2 size={18} />
-                  </motion.button>
-                </div>
-              )}
-
               {/* Project Image Section */}
-              {project.image && (
+              {project.image ? (
                 <div className="relative group aspect-video">
                   <img
                     src={project.image}
@@ -329,33 +126,34 @@ const Projects = () => {
                     </div>
                   </motion.div>
                 </div>
-              )}
-
-              {/* Project Links Section (when no image) */}
-              {!project.image && (
-                <div className="p-4 flex justify-end space-x-4">
-                  <motion.a
-                    href={project.github}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    whileHover={{ scale: 1.2, rotate: 360 }}
-                    whileTap={{ scale: 0.9 }}
-                    className="text-secondary hover:text-white transition-colors duration-300"
-                  >
-                    <FiGithub size={24} />
-                  </motion.a>
-                  {project.live && (
+              ) : (
+                <div className="relative group aspect-video bg-primary/50 flex items-center justify-center">
+                  <div className="flex space-x-6">
                     <motion.a
-                      href={project.live}
+                      href={project.github}
                       target="_blank"
                       rel="noopener noreferrer"
                       whileHover={{ scale: 1.2, rotate: 360 }}
                       whileTap={{ scale: 0.9 }}
-                      className="text-secondary hover:text-white transition-colors duration-300"
+                      className="text-secondary hover:text-white transition-colors duration-300 flex flex-col items-center"
                     >
-                      <FiExternalLink size={24} />
+                      <FiGithub size={32} />
+                      <span className="text-sm mt-2">GitHub</span>
                     </motion.a>
-                  )}
+                    {project.live && (
+                      <motion.a
+                        href={project.live}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        whileHover={{ scale: 1.2, rotate: 360 }}
+                        whileTap={{ scale: 0.9 }}
+                        className="text-secondary hover:text-white transition-colors duration-300 flex flex-col items-center"
+                      >
+                        <FiExternalLink size={32} />
+                        <span className="text-sm mt-2">Live Demo</span>
+                      </motion.a>
+                    )}
+                  </div>
                 </div>
               )}
 
@@ -385,165 +183,6 @@ const Projects = () => {
             </motion.div>
           ))}
         </motion.div>
-
-        {/* Add/Edit Project Modal */}
-        <AnimatePresence>
-          {isModalOpen && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50"
-              onClick={(e) => e.target === e.currentTarget && setIsModalOpen(false)}
-            >
-              <motion.div
-                initial={{ scale: 0.9, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.9, opacity: 0 }}
-                className="bg-tertiary p-8 rounded-lg w-full max-w-md relative"
-              >
-                <button
-                  onClick={() => {
-                    setIsModalOpen(false);
-                    setIsEditMode(false);
-                    setEditingProject(null);
-                  }}
-                  className="absolute top-4 right-4 text-lightText hover:text-secondary transition-colors"
-                >
-                  <FiX size={24} />
-                </button>
-                <h3 className="text-2xl font-bold text-lightText mb-6">
-                  {isEditMode ? 'Edit Project' : 'Add New Project'}
-                </h3>
-                <form onSubmit={isEditMode ? handleUpdate : handleAddProject} className="space-y-4">
-                  <div>
-                    <label className="block text-lightText mb-2">Title</label>
-                    <input
-                      type="text"
-                      value={isEditMode ? editingProject.title : newProject.title}
-                      onChange={(e) => {
-                        if (isEditMode) {
-                          setEditingProject({ ...editingProject, title: e.target.value });
-                        } else {
-                          setNewProject({ ...newProject, title: e.target.value });
-                        }
-                      }}
-                      className="w-full bg-primary text-lightText p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary transition-all duration-300"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-lightText mb-2">Description</label>
-                    <textarea
-                      value={isEditMode ? editingProject.description : newProject.description}
-                      onChange={(e) => {
-                        if (isEditMode) {
-                          setEditingProject({ ...editingProject, description: e.target.value });
-                        } else {
-                          setNewProject({ ...newProject, description: e.target.value });
-                        }
-                      }}
-                      className="w-full bg-primary text-lightText p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary transition-all duration-300"
-                      rows="3"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-lightText mb-2">Project Image</label>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleImageChange}
-                      className="w-full text-lightText"
-                    />
-                    {isEditMode && editingProject.image && (
-                      <div className="mt-2">
-                        <p className="text-sm text-lightestText mb-1">Current image:</p>
-                        <img
-                          src={editingProject.image}
-                          alt="Current project"
-                          className="w-20 h-20 object-cover rounded"
-                        />
-                      </div>
-                    )}
-                  </div>
-                  <div>
-                    <label className="block text-lightText mb-2">GitHub URL</label>
-                    <input
-                      type="url"
-                      value={isEditMode ? editingProject.github : newProject.github}
-                      onChange={(e) => {
-                        if (isEditMode) {
-                          setEditingProject({ ...editingProject, github: e.target.value });
-                        } else {
-                          setNewProject({ ...newProject, github: e.target.value });
-                        }
-                      }}
-                      className="w-full bg-primary text-lightText p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary transition-all duration-300"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-lightText mb-2">Live URL (Optional)</label>
-                    <input
-                      type="url"
-                      value={isEditMode ? editingProject.live : newProject.live}
-                      onChange={(e) => {
-                        if (isEditMode) {
-                          setEditingProject({ ...editingProject, live: e.target.value });
-                        } else {
-                          setNewProject({ ...newProject, live: e.target.value });
-                        }
-                      }}
-                      className="w-full bg-primary text-lightText p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary transition-all duration-300"
-                      placeholder="https://your-project-url.com"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-lightText mb-2">Technologies (comma-separated)</label>
-                    <input
-                      type="text"
-                      value={isEditMode ? editingProject.tech : newProject.tech}
-                      onChange={(e) => {
-                        if (isEditMode) {
-                          setEditingProject({ ...editingProject, tech: e.target.value });
-                        } else {
-                          setNewProject({ ...newProject, tech: e.target.value });
-                        }
-                      }}
-                      className="w-full bg-primary text-lightText p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary transition-all duration-300"
-                      placeholder="React, Tailwind, Node.js"
-                      required
-                    />
-                  </div>
-                  <div className="flex justify-end space-x-4 mt-6">
-                    <motion.button
-                      type="button"
-                      onClick={() => {
-                        setIsModalOpen(false);
-                        setIsEditMode(false);
-                        setEditingProject(null);
-                      }}
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      className="px-4 py-2 text-lightText hover:text-secondary transition-colors duration-300"
-                    >
-                      Cancel
-                    </motion.button>
-                    <motion.button
-                      type="submit"
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      className="px-6 py-2 bg-secondary text-primary rounded-lg hover:bg-opacity-80 transition-all duration-300"
-                    >
-                      {isEditMode ? 'Save Changes' : 'Add Project'}
-                    </motion.button>
-                  </div>
-                </form>
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
       </div>
     </div>
   );
