@@ -11,6 +11,9 @@ const Projects = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [editingProject, setEditingProject] = useState(null);
+  const [isAdmin, setIsAdmin] = useState(() => {
+    return localStorage.getItem('isPortfolioAdmin') === 'true';
+  });
   const [newProject, setNewProject] = useState({
     title: '',
     description: '',
@@ -25,6 +28,15 @@ const Projects = () => {
     localStorage.setItem('portfolioProjects', JSON.stringify(projects));
     console.log('Projects updated:', projects); // Debug log
   }, [projects]);
+
+  // Secret admin activation function
+  const activateAdmin = () => {
+    const password = prompt('Enter admin password:');
+    if (password === 'sahil016') { // You can change this password
+      localStorage.setItem('isPortfolioAdmin', 'true');
+      setIsAdmin(true);
+    }
+  };
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -98,7 +110,7 @@ const Projects = () => {
   };
 
   return (
-    <div id="projects" className="min-h-screen py-20 relative">
+    <div id="projects" className="min-h-screen py-20 relative" onDoubleClick={activateAdmin}>
       {/* Background Decorative Elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute w-full h-full">
@@ -148,18 +160,20 @@ const Projects = () => {
             />
           </h2>
           <p className="text-lightestText mb-8">Some things I've built</p>
-          <motion.button
-            onClick={() => setIsModalOpen(true)}
-            className="group relative inline-flex items-center justify-center px-8 py-3 overflow-hidden font-medium bg-secondary text-primary rounded-lg hover:bg-opacity-80 transition-all duration-300"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            <span className="absolute w-0 h-0 transition-all duration-500 ease-out bg-primary rounded-full group-hover:w-56 group-hover:h-56"></span>
-            <span className="relative flex items-center space-x-2">
-              <FiPlus className="w-5 h-5" />
-              <span>Add New Project</span>
-            </span>
-          </motion.button>
+          {isAdmin && (
+            <motion.button
+              onClick={() => setIsModalOpen(true)}
+              className="group relative inline-flex items-center justify-center px-8 py-3 overflow-hidden font-medium bg-secondary text-primary rounded-lg hover:bg-opacity-80 transition-all duration-300"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <span className="absolute w-0 h-0 transition-all duration-500 ease-out bg-primary rounded-full group-hover:w-56 group-hover:h-56"></span>
+              <span className="relative flex items-center space-x-2">
+                <FiPlus className="w-5 h-5" />
+                <span>Add New Project</span>
+              </span>
+            </motion.button>
+          )}
         </motion.div>
 
         {/* Projects Grid */}
@@ -176,27 +190,29 @@ const Projects = () => {
               variants={item}
               className="bg-tertiary rounded-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300 relative"
             >
-              {/* Edit and Delete Buttons */}
-              <div className="absolute top-2 right-2 flex space-x-2 z-20">
-                <motion.button
-                  onClick={() => handleEdit(project)}
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
-                  className="p-2 bg-tertiary rounded-full text-secondary hover:bg-primary transition-colors duration-300 shadow-lg"
-                  title="Edit project"
-                >
-                  <FiEdit2 size={18} />
-                </motion.button>
-                <motion.button
-                  onClick={() => handleDelete(project.id)}
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
-                  className="p-2 bg-tertiary rounded-full text-red-400 hover:text-red-500 hover:bg-primary transition-colors duration-300 shadow-lg"
-                  title="Delete project"
-                >
-                  <FiTrash2 size={18} />
-                </motion.button>
-              </div>
+              {/* Edit and Delete Buttons - Only show for admin */}
+              {isAdmin && (
+                <div className="absolute top-2 right-2 flex space-x-2 z-20">
+                  <motion.button
+                    onClick={() => handleEdit(project)}
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    className="p-2 bg-tertiary rounded-full text-secondary hover:bg-primary transition-colors duration-300 shadow-lg"
+                    title="Edit project"
+                  >
+                    <FiEdit2 size={18} />
+                  </motion.button>
+                  <motion.button
+                    onClick={() => handleDelete(project.id)}
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    className="p-2 bg-tertiary rounded-full text-red-400 hover:text-red-500 hover:bg-primary transition-colors duration-300 shadow-lg"
+                    title="Delete project"
+                  >
+                    <FiTrash2 size={18} />
+                  </motion.button>
+                </div>
+              )}
 
               {/* Project Image Section */}
               {project.image && (
