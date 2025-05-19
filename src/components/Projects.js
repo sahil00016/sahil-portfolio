@@ -29,12 +29,21 @@ const Projects = () => {
     console.log('Projects updated:', projects); // Debug log
   }, [projects]);
 
-  // Secret admin activation function
-  const activateAdmin = () => {
-    const password = prompt('Enter admin password:');
-    if (password === 'sahil016') { // You can change this password
-      localStorage.setItem('isPortfolioAdmin', 'true');
-      setIsAdmin(true);
+  // Modified admin activation/deactivation function
+  const toggleAdmin = () => {
+    const password = prompt(isAdmin ? 'Enter password to logout:' : 'Enter admin password:');
+    if (password === 'sahil016') {
+      if (isAdmin) {
+        // Logout
+        localStorage.removeItem('isPortfolioAdmin');
+        setIsAdmin(false);
+        alert('Logged out of admin mode');
+      } else {
+        // Login
+        localStorage.setItem('isPortfolioAdmin', 'true');
+        setIsAdmin(true);
+        alert('Logged in as admin');
+      }
     }
   };
 
@@ -110,7 +119,7 @@ const Projects = () => {
   };
 
   return (
-    <div id="projects" className="min-h-screen py-20 relative" onDoubleClick={activateAdmin}>
+    <div id="projects" className="min-h-screen py-20 relative" onDoubleClick={toggleAdmin}>
       {/* Background Decorative Elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute w-full h-full">
