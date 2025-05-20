@@ -28,6 +28,15 @@ const projects = [
   },
   {
     id: 4,
+    title: "chatbot-gemini",
+    description: "Chatbot-Gemini A Next.js chatbot with Supabase authentication, Gemini AI integration, PDF parsing, and chat history storage. Built for an internship assignment, it offers AI and PDF chat modes in a clean, responsive interface.",
+    image: "/images/chatbot-gemini.png",
+    github: "https://github.com/sahil00016/chatbot-gemini",
+    live: "https://github.com/sahil00016/chatbot-gemini",
+    tech: "Nextjs, Gemini API, Supabase Auth(JWT)"
+  },
+  {
+    id: 5,
     title: "Event-Organisation-App",
     description: "A visually stunning, feature-rich Flutter app that allows users to host and book events of any kind — from concerts and weddings to private parties and conferences.",
     image: "",
@@ -36,7 +45,7 @@ const projects = [
     tech: "Flutter, FireBase Store, Google Maps API"
   },
   {
-    id: 5,
+    id: 6,
     title: "chat-app-mern",
     description: "A modern real-time chat application built with React and Node.js integrated with Socket.io. Experience seamless messaging with features like private chats, group conversations, and real-time status updates.",
     image: "",
@@ -45,7 +54,7 @@ const projects = [
     tech: "React,Tailwind CSS, Socket.io, Node.js",
   },
   {
-    id: 6,
+    id: 7,
     title: "Ai-Study-Planner",
     description: "An AI-powered study planning app built with Flutter that analyzes a user's study style, suggests personalized learning schedules, and provides an interactive flashcard system to enhance retention.",
     image: "",
