@@ -30,7 +30,7 @@ const projects = [
     id: 4,
     title: "chatbot-gemini",
     description: "Chatbot-Gemini A Next.js chatbot with Supabase authentication, Gemini AI integration, PDF parsing, and chat history storage. Built for an internship assignment, it offers AI and PDF chat modes in a clean, responsive interface.",
-    image: "/images/chatbot-gemini.png",
+    image: "/images/chatbot-2.png", // Updated image path
     github: "https://github.com/sahil00016/chatbot-gemini",
     live: "https://github.com/sahil00016/chatbot-gemini",
     tech: "Nextjs, Gemini API, Supabase Auth(JWT)"
